@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tiểu Lục Nhâm Giang Thị - Mobile</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f8;
+            --text-color: #333;
+            --border-color: #5d4037;
+            --highlight: #d32f2f;
+            --blue-text: #1976d2;
+            --green-text: #388e3c;
+            --gold-text: #fbc02d;
+            --purple-text: #7b1fa2;
+            --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 15px;
+            font-size: 16px;
+        }
+
+        h1 { 
+            text-align: center; 
+            color: var(--border-color); 
+            margin-bottom: 20px; 
+            font-size: 1.5rem;
+        }
+
+        /* --- INPUT CONTROLS --- */
+        .controls {
+            background: var(--white); 
+            padding: 20px; 
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 15px;
+            justify-content: center; 
+            align-items: flex-end;
+            margin-bottom: 25px;
+        }
+
+        .input-group { display: flex; flex-direction: column; width: 30%; min-width: 150px; }
+        .input-group label { font-weight: 600; font-size: 0.9em; margin-bottom: 8px; color: #555; }
+        
+        input, select { 
+            padding: 12px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            width: 100%; 
+            background: #fff;
+        }
+        
+        button {
+            padding: 12px 30px; 
+            font-size: 16px; 
+            font-weight: bold;
+            background-color: var(--border-color); 
+            color: white;
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            height: 46px;
+            width: auto;
+        }
+        button:active { background-color: #3e2723; transform: scale(0.98); }
+
+        /* --- GRID QUẺ --- */
+        .que-container {
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 8px;
+            background-color: #ddd; 
+            border: 4px solid var(--border-color);
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .cung-box {
+            background-color: var(--white); 
+            padding: 10px 5px; 
+            min-height: 140px;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between;
+            text-align: center; 
+            position: relative;
+        }
+
+        .target-cung { background-color: #e3f2fd !important; border: 2px solid var(--blue-text); }
+        .self-cung { background-color: #fff3e0 !important; border: 2px solid var(--highlight); }
+        
+        /* Định vị Desktop */
+        .pos-1 { grid-column: 1; grid-row: 1; } 
+        .pos-2 { grid-column: 2; grid-row: 1; } 
+        .pos-3 { grid-column: 3; grid-row: 1; } 
+        .pos-0 { grid-column: 1; grid-row: 2; } 
+        .pos-5 { grid-column: 2; grid-row: 2; } 
+        .pos-4 { grid-column: 3; grid-row: 2; } 
+
+        .top-info { display: flex; justify-content: space-between; font-size: 0.75em; font-weight: bold; padding: 0 5px;}
+        .ngu-tinh { color: #f57f17; }
+        .luc-than { color: var(--blue-text); }
+        .dia-chi { font-size: 1.3em; font-weight: 800; color: var(--green-text); margin: 5px 0; }
+        .luc-than-body { font-size: 1em; font-weight: bold; color: var(--purple-text); }
+        .cung-name { font-weight: bold; color: #555; font-size: 0.9em; }
+        .markers { 
+            position: absolute; bottom: 2px; left: 2px; right: 2px;
+            font-size: 0.65em; font-weight: bold; 
+            display: flex; gap: 2px; justify-content: center;
+        }
+        .tag { padding: 2px 4px; border-radius: 3px; color: white; white-space: nowrap; }
+        .tag-self { background-color: var(--highlight); }
+        .tag-target { background-color: var(--blue-text); }
+
+        /* --- PHÂN TÍCH LAYOUT --- */
+        .analysis-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .analysis-card {
+            background: var(--white); border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border-top: 4px solid #ccc;
+        }
+        .card-self { border-color: var(--highlight); }
+        .card-target { border-color: var(--blue-text); }
+
+        .card-header {
+            padding: 12px 15px; font-weight: bold; font-size: 1.1em;
+            border-bottom: 1px solid #eee; background: #fafafa;
+        }
+        .card-self .card-header { color: var(--highlight); }
+        .card-target .card-header { color: var(--blue-text); }
+
+        .card-body { padding: 15px; }
+
+        .detail-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed #eee;
+        }
+        .detail-row:last-child { border-bottom: none; margin-bottom: 0; }
+        
+        .label { font-size: 0.9em; color: #666; font-weight: 600; width: 35%; }
+        .content { width: 65%; text-align: right; font-weight: 500; }
+        
+        .highlight-val { font-weight: bold; color: #333; }
+        .sub-text { display: block; font-size: 0.85em; color: #777; margin-top: 2px; font-style: italic; }
+
+        .advice-box {
+            grid-column: 1 / -1; background: var(--white); padding: 20px;
+            border-radius: 12px; margin-top: 10px;
+            border-left: 5px solid var(--green-text);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .advice-list { margin: 10px 0 0 0; padding-left: 20px; }
+        .advice-list li { margin-bottom: 10px; line-height: 1.5; }
+        .adv-label { font-weight: bold; display: inline-block; width: 140px; }
+
+        #deviceInfo {
+            text-align: center; font-size: 0.8em; color: #999; margin-top: -15px; margin-bottom: 20px;
+        }
+
+        /* --- MOBILE RESPONSIVE --- */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .controls { flex-direction: column; gap: 15px; }
+            .input-group { width: 100%; }
+            button { width: 100%; margin-top: 10px; }
+            
+            /* Chuyển thành 2 cột trên mobile */
+            .que-container { grid-template-columns: repeat(2, 1fr); }
+            .pos-0, .pos-1, .pos-2, .pos-3, .pos-4, .pos-5 { grid-column: auto; grid-row: auto; }
+            
+            .analysis-wrapper { grid-template-columns: 1fr; }
+            .adv-label { display: block; width: auto; margin-bottom: 3px; }
+            
+            .dia-chi { font-size: 1.2em; }
+            .luc-than-body { font-size: 1em; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Tiểu Lục Nhâm - Giang Thị</h1>
+    <div id="deviceInfo">Đang phát hiện thiết bị...</div>
+    
+    <div class="controls">
+        <div class="input-group">
+            <label>1. Nhập Số (Tâm động):</label>
+            <input type="number" id="inputNumber" min="1" placeholder="VD: 9">
+        </div>
+        <div class="input-group">
+            <label>2. Chọn Sự Việc (Dụng Thần):</label>
+            <select id="inputDungThan">
+                <option value="Bản Thân">Bản Thân (Cầu mưu chung)</option>
+                <option value="Thê Tài">Thê Tài (Tiền, Vợ)</option>
+                <option value="Quan Quỷ">Quan Quỷ (Công danh, Chồng, Bệnh)</option>
+                <option value="Phụ Mẫu">Phụ Mẫu (Cha mẹ, Giấy tờ)</option>
+                <option value="Tử Tôn">Tử Tôn (Con cái, Phúc đức)</option>
+                <option value="Huynh Đệ">Huynh Đệ (Anh em, Hợp tác)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>3. Giờ Xem:</label>
+            <select id="inputHour">
+                <option value="-1">-- Tự động --</option>
+                <option value="0">Tý (23-1h)</option>
+                <option value="1">Sửu (1-3h)</option>
+                <option value="2">Dần (3-5h)</option>
+                <option value="3">Mão (5-7h)</option>
+                <option value="4">Thìn (7-9h)</option>
+                <option value="5">Tỵ (9-11h)</option>
+                <option value="6">Ngọ (11-13h)</option>
+                <option value="7">Mùi (13-15h)</option>
+                <option value="8">Thân (15-17h)</option>
+                <option value="9">Dậu (17-19h)</option>
+                <option value="10">Tuất (19-21h)</option>
+                <option value="11">Hợi (21-23h)</option>
+            </select>
+        </div>
+        <button onclick="lapQue()">AN QUẺ</button>
+    </div>
+
+    <div id="resultArea" style="display:none;">
+        <div class="que-container">
+            <div id="cung-1" class="cung-box pos-1"></div>
+            <div id="cung-2" class="cung-box pos-2"></div>
+            <div id="cung-3" class="cung-box pos-3"></div>
+            <div id="cung-0" class="cung-box pos-0"></div>
+            <div id="cung-5" class="cung-box pos-5"></div>
+            <div id="cung-4" class="cung-box pos-4"></div>
+        </div>
+
+        <div class="analysis-wrapper">
+            <div class="analysis-card card-self">
+                <div class="card-header">👤 1. PHÂN TÍCH BẢN THÂN (Gốc)</div>
+                <div class="card-body">
+                    <div class="detail-row">
+                        <div class="label">Lục Cung</div>
+                        <div class="content">
+                            <div class="highlight-val" id="selfCungName"></div>
+                            <span class="sub-text" id="selfCungMeaning"></span>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="label">Địa Chi</div>
+                        <div class="content">
+                            <div class="highlight-val" id="selfChiName"></div>
+                            <span class="sub-text" id="selfChiHanh"></span>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="label">Lục Thần</div>
+                        <div class="content">
+                            <div class="highlight-val" id="selfThanName"></div>
+                            <span class="sub-text" id="selfThanMeaning"></span>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="label">Ngũ Tinh</div>
+                        <div class="content">
+                            <div class="highlight-val" id="selfTinhName"></div>
+                            <span class="sub-text" id="selfTinhInteract"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analysis-card card-target">
+                <div class="card-header">🎯 2. PHÂN TÍCH SỰ VIỆC (Ngọn): <span id="targetSubjectHeader" style="text-transform: uppercase; color:var(--blue-text)"></span></div>
+                <div class="card-body">
+                    <div class="detail-row">
+                        <div class="label">Lục Cung</div>
+                        <div class="content">
+                            <div class="highlight-val" id="targetCungName"></div>
+                            <span class="sub-text" id="targetCungMeaning"></span>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="label">Địa Chi</div>
+                        <div class="content">
+                            <div class="highlight-val" id="targetChiName"></div>
+                            <span class="sub-text" id="targetChiHanh"></span>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="label">Lục Thần</div>
+                        <div class="content">
+                            <div class="highlight-val" id="targetThanName"></div>
+                            <span class="sub-text" id="targetThanMeaning"></span>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="label">Ngũ Tinh</div>
+                        <div class="content">
+                            <div class="highlight-val" id="targetTinhName"></div>
+                            <span class="sub-text" id="targetTinhInteract"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="advice-box">
+                <h3 style="margin-top:0; color:var(--green-text)">📌 Lời Khuyên Cụ Thể (Theo Sách):</h3>
+                <p><strong>🔗 Quan hệ Ngũ Hành (Bản Thân vs Sự Việc):</strong> <span id="relSinhKhac"></span></p>
+                <p><strong>🔗 Quan hệ Địa Chi (Xung/Hợp):</strong> <span id="relDiaChi"></span></p>
+                <hr style="border:0; border-top:1px dashed #ccc; margin: 15px 0;">
+                <div>
+                    <ul id="bookAdvice" class="advice-list"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- NHẬN DIỆN THIẾT BỊ ---
+        function detectDevice() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+            const deviceEl = document.getElementById('deviceInfo');
+            if (isMobile) {
+                deviceEl.innerText = "📱 Đã phát hiện giao diện điện thoại - Đã tối ưu hiển thị.";
+                deviceEl.style.color = "#2e7d32";
+            } else {
+                deviceEl.innerText = "💻 Đang sử dụng giao diện máy tính.";
+            }
+        }
+        detectDevice();
+        window.onresize = detectDevice;
+
+        // --- DỮ LIỆU TỪ TÀI LIỆU GIANG THỊ ---
+        
+        const CUNG = ["Đại An", "Lưu Liên", "Tốc Hỷ", "Xích Khẩu", "Tiểu Cát", "Không Vong"];
+        const CUNG_MEANING = [
+            "Tĩnh, ổn định, cát tường, bất động.", 
+            "Trì hoãn, dây dưa, chưa rõ ràng, lặp lại.", 
+            "Nhanh chóng, vui vẻ, chủ động, hỷ sự.", 
+            "Tranh chấp, thị phi, vất vả, nguy hiểm.", 
+            "Hòa hợp, tốt đẹp, đào hoa, thuận lợi.", 
+            "Hư vô, lo lắng, thất bại, không thành." 
+        ];
+
+        const DIA_CHI = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+        const HANH_DIA_CHI = [0, 3, 1, 1, 3, 2, 2, 3, 4, 4, 3, 0]; // 0:Thủy, 1:Mộc, 2:Hỏa, 3:Thổ, 4:Kim
+        const TEN_HANH = ["Thủy", "Mộc", "Hỏa", "Thổ", "Kim"];
+
+        const LUC_THAN = ["Thanh Long", "Chu Tước", "Câu Trần", "Bạch Hổ", "Huyền Vũ", "Đằng Xà"];
+        const LUC_THAN_MEANING = [
+            "Cát thần: Quý nhân, vui vẻ, chính trực, mới mẻ.", 
+            "Cát thần: Văn thư, tin tức, khẩu thiệt, nóng nảy.", 
+            "Trung tính: Điền thổ, chậm chạp, tranh chấp, cứng nhắc.", 
+            "Hung thần: Tai họa, máu me, uy quyền, nóng nảy.", 
+            "Hung thần: Mờ ám, tiểu nhân, trộm cắp, dối trá.", 
+            "Hung thần: Quái dị, lo âu, giả dối, thay đổi." 
+        ];
+
+        const NGU_TINH = ["Mộc", "Hỏa", "Thổ", "Kim", "Thủy", "Không"];
+        const TINH_TO_HANH = [1, 2, 3, 4, 0, -1]; 
+
+        // Dữ liệu Lời Khuyên (Đã tách rõ)
+        const ADVICE_DB = [
+            // Đại An
+            {
+                qn: "Sửu, Tý, Mùi, Ngọ", 
+                tn: "Thìn, Dậu", 
+                ht: "Tây Nam, Đông Bắc", 
+                hx: "Tây, Tây Bắc, Nam (Hao tài)"
+            }, 
+            // Lưu Liên
+            {
+                qn: "Mão, Tuất", 
+                tn: "Ngọ, Mùi, Tý, Sửu", 
+                ht: "Nam", 
+                hx: "Đông Bắc, Tây Nam, Đông, Đông Nam"
+            }, 
+            // Tốc Hỷ
+            {
+                qn: "Thìn, Dậu", 
+                tn: "Tỵ, Thân", 
+                ht: "Tây, Tây Bắc", 
+                hx: "Bắc, Đông Bắc, Tây Nam"
+            }, 
+            // Xích Khẩu
+            {
+                qn: "Dần, Hợi", 
+                tn: "Mão, Tuất", 
+                ht: "Đông, Đông Nam", 
+                hx: "Nam, Bắc (Hao tổn)"
+            }, 
+            // Tiểu Cát
+            {
+                qn: "Sửu, Tý, Mùi, Ngọ", 
+                tn: "Thìn, Dậu", 
+                ht: "Tây Nam, Đông Bắc", 
+                hx: "Tây, Tây Bắc, Nam"
+            }, 
+            // Không Vong
+            {
+                qn: "Tỵ, Thân", 
+                tn: "Dần, Hợi", 
+                ht: "Bắc", 
+                hx: "Đông, Đông Nam, Tây, Tây Bắc"
+            } 
+        ];
+
+        // --- LOGIC TÍNH TOÁN ---
+
+        function layGioHienTai() {
+            const h = new Date().getHours();
+            if (h >= 23 || h < 1) return 0; if (h < 3) return 1; if (h < 5) return 2;
+            if (h < 7) return 3; if (h < 9) return 4; if (h < 11) return 5;
+            if (h < 13) return 6; if (h < 15) return 7; if (h < 17) return 8;
+            if (h < 19) return 9; if (h < 21) return 10; return 11;
+        }
+
+        function checkSinhKhac(hanhA, hanhB) {
+            if (hanhA === hanhB) return "Tương Hòa (Bình)";
+            if ((hanhA===0 && hanhB===1) || (hanhA===1 && hanhB===2) || (hanhA===2 && hanhB===3) || (hanhA===3 && hanhB===4) || (hanhA===4 && hanhB===0)) return "Sinh Xuất (Ta sinh Việc -> Vất vả)";
+            if ((hanhB===0 && hanhA===1) || (hanhB===1 && hanhA===2) || (hanhB===2 && hanhA===3) || (hanhB===3 && hanhA===4) || (hanhB===4 && hanhA===0)) return "Sinh Nhập (Việc sinh Ta -> Thuận lợi)";
+            if ((hanhA===0 && hanhB===2) || (hanhA===1 && hanhB===3) || (hanhA===2 && hanhB===4) || (hanhA===3 && hanhB===0) || (hanhA===4 && hanhB===1)) return "Khắc Xuất (Ta khắc Việc -> Chiếm ưu thế)";
+            return "Khắc Nhập (Việc khắc Ta -> Áp lực/Thất bại)";
+        }
+
+        function getStarInteraction(tinhIdx, hanhDiaChi) {
+            if (tinhIdx === 5) return "Sao Thiên Không: Chủ hư vô, khó thành.";
+            let hanhTinh = TINH_TO_HANH[tinhIdx];
+            if ((hanhTinh===0 && hanhDiaChi===1) || (hanhTinh===1 && hanhDiaChi===2) || (hanhTinh===2 && hanhDiaChi===3) || (hanhTinh===3 && hanhDiaChi===4) || (hanhTinh===4 && hanhDiaChi===0)) 
+                return "Sao SINH Địa chi: Rất tốt, có trợ lực.";
+            if ((hanhTinh===0 && hanhDiaChi===2) || (hanhTinh===1 && hanhDiaChi===3) || (hanhTinh===2 && hanhDiaChi===4) || (hanhTinh===3 && hanhDiaChi===0) || (hanhTinh===4 && hanhDiaChi===1)) 
+                return "Sao KHẮC Địa chi: Xấu, bị cản trở.";
+            if (hanhTinh === hanhDiaChi) return "Sao TƯƠNG HÒA: Bình ổn.";
+            return "Sao TIẾT KHÍ: Hao tổn sức lực.";
+        }
+
+        function checkDiaChiRel(chiA, chiB) {
+            if (chiA === chiB) return "Thái Tuế (Trùng nhau)";
+            if (Math.abs(chiA - chiB) === 6) return "Lục Xung (Xấu - Xung đột)";
+            let sum = chiA + chiB;
+            if ((chiA===0 && chiB===1) || (chiA===1 && chiB===0) || sum === 13 || (chiA===6 && chiB===7) || (chiA===7 && chiB===6)) return "Lục Hợp (Tốt - Hòa hợp)";
+            return "Bình thường";
+        }
+
+        function getElementRelation(selfElem, targetElem) {
+            if (selfElem === targetElem) return "Huynh Đệ";
+            if ((targetElem === 0 && selfElem === 1) || (targetElem === 1 && selfElem === 2) || (targetElem === 2 && selfElem === 3) || (targetElem === 3 && selfElem === 4) || (targetElem === 4 && selfElem === 0)) return "Phụ Mẫu"; 
+            if ((selfElem === 0 && targetElem === 1) || (selfElem === 1 && targetElem === 2) || (selfElem === 2 && targetElem === 3) || (selfElem === 3 && targetElem === 4) || (selfElem === 4 && targetElem === 0)) return "Tử Tôn"; 
+            if ((targetElem === 0 && selfElem === 2) || (targetElem === 1 && selfElem === 3) || (targetElem === 2 && selfElem === 4) || (targetElem === 3 && selfElem === 0) || (targetElem === 4 && selfElem === 1)) return "Quan Quỷ"; 
+            return "Thê Tài";
+        }
+
+        function lapQue() {
+            let inputVal = document.getElementById("inputNumber").value;
+            let selectedDungThan = document.getElementById("inputDungThan").value;
+            if (!inputVal || inputVal <= 0) { alert("Vui lòng nhập số dương!"); return; }
+            let num = parseInt(inputVal);
+            let hourVal = parseInt(document.getElementById("inputHour").value);
+            if (hourVal === -1) hourVal = layGioHienTai();
+
+            // Tính toán
+            let dayPalaceIndex = (num - 1) % 6;
+            let hourPalaceIndex = (dayPalaceIndex + hourVal) % 6;
+            
+            let palaceToChi = new Array(6).fill(null);
+            let currentPalace = hourPalaceIndex; let currentChi = hourVal;
+            for (let i = 0; i < 6; i++) {
+                palaceToChi[currentPalace] = currentChi;
+                currentPalace = (currentPalace + 1) % 6;
+                currentChi = (currentChi + 2) % 12;
+            }
+
+            let startThanhLong = hourVal % 6;
+            let palaceToLucThan = new Array(6).fill(null);
+            let palaceToLucThanIdx = new Array(6).fill(null);
+            for (let i = 0; i < 6; i++) { 
+                let idx = (startThanhLong + i) % 6;
+                palaceToLucThan[idx] = LUC_THAN[i];
+                palaceToLucThanIdx[idx] = i;
+            }
+
+            let palaceToNguTinh = new Array(6).fill(null);
+            let palaceToNguTinhIdx = new Array(6).fill(null);
+            for (let i = 0; i < 6; i++) { 
+                let idx = (dayPalaceIndex + i) % 6;
+                palaceToNguTinh[idx] = NGU_TINH[i];
+                palaceToNguTinhIdx[idx] = i;
+            }
+
+            let selfChi = hourVal;
+            let selfHanh = HANH_DIA_CHI[selfChi];
+            let palaceToLucThanBody = new Array(6).fill(null);
+            let relations = [];
+            for(let i=0; i<6; i++) {
+                let chi = palaceToChi[i];
+                let rel = getElementRelation(selfHanh, HANH_DIA_CHI[chi]);
+                relations.push({palaceIdx: i, rel: rel});
+            }
+            if (selfHanh !== 3) {
+                for(let k=0; k<6; k++) {
+                    let idx = (hourPalaceIndex + k) % 6;
+                    if (HANH_DIA_CHI[palaceToChi[idx]] === 3) { relations.find(r => r.palaceIdx === idx).rel = "Huynh Đệ"; break; }
+                }
+            }
+            relations.find(r => r.palaceIdx === hourPalaceIndex).rel = "Bản Thân";
+            for(let item of relations) palaceToLucThanBody[item.palaceIdx] = item.rel;
+
+            // Hiển thị
+            document.getElementById("resultArea").style.display = "block";
+
+            let selfData = {};
+            let targetData = {};
+            let targetIdx = -1;
+
+            for (let i = 0; i < 6; i++) {
+                let cellId = "cung-" + i;
+                let el = document.getElementById(cellId);
+                
+                let chiName = DIA_CHI[palaceToChi[i]];
+                let thanName = palaceToLucThan[i];
+                let tinhName = palaceToNguTinh[i];
+                let bodyName = palaceToLucThanBody[i];
+                let hanhHienTai = HANH_DIA_CHI[palaceToChi[i]];
+
+                el.className = "cung-box " + "pos-" + i;
+
+                let currentData = {
+                    cungName: CUNG[i],
+                    cungMeaning: CUNG_MEANING[i],
+                    chiName: chiName,
+                    hanhName: TEN_HANH[hanhHienTai],
+                    hanhVal: hanhHienTai,
+                    chiVal: palaceToChi[i],
+                    thanName: thanName,
+                    thanMeaning: LUC_THAN_MEANING[palaceToLucThanIdx[i]],
+                    tinhName: tinhName,
+                    tinhInteract: getStarInteraction(palaceToNguTinhIdx[i], hanhHienTai)
+                };
+
+                if (i === hourPalaceIndex) {
+                    el.classList.add("self-cung");
+                    selfData = currentData;
+                }
+                if (bodyName === selectedDungThan) {
+                    el.classList.add("target-cung");
+                    targetData = currentData;
+                    targetIdx = i;
+                }
+
+                let markers = "";
+                if (i === dayPalaceIndex) markers += "<span class='tag tag-self'>Ngày</span>";
+                if (i === hourPalaceIndex) markers += "<span class='tag tag-target'>Thân</span>";
+
+                el.innerHTML = `
+                    <div class="top-info"><span class="ngu-tinh">${tinhName}</span><span class="luc-than">${thanName}</span></div>
+                    <div class="dia-chi">${chiName}</div>
+                    <div class="luc-than-body">${bodyName}</div>
+                    <div class="cung-name">${CUNG[i]}</div>
+                    <div class="markers">${markers}</div>
+                `;
+            }
+
+            // Fill Analysis
+            document.getElementById("selfCungName").innerText = selfData.cungName;
+            document.getElementById("selfCungMeaning").innerText = selfData.cungMeaning;
+            document.getElementById("selfChiName").innerText = selfData.chiName;
+            document.getElementById("selfChiHanh").innerText = `Hành: ${selfData.hanhName}`;
+            document.getElementById("selfThanName").innerText = selfData.thanName;
+            document.getElementById("selfThanMeaning").innerText = selfData.thanMeaning;
+            document.getElementById("selfTinhName").innerText = selfData.tinhName;
+            document.getElementById("selfTinhInteract").innerText = selfData.tinhInteract;
+
+            document.getElementById("targetSubjectHeader").innerText = selectedDungThan;
+            document.getElementById("targetCungName").innerText = targetData.cungName;
+            document.getElementById("targetCungMeaning").innerText = targetData.cungMeaning;
+            document.getElementById("targetChiName").innerText = targetData.chiName;
+            document.getElementById("targetChiHanh").innerText = `Hành: ${targetData.hanhName}`;
+            document.getElementById("targetThanName").innerText = targetData.thanName;
+            document.getElementById("targetThanMeaning").innerText = targetData.thanMeaning;
+            document.getElementById("targetTinhName").innerText = targetData.tinhName;
+            document.getElementById("targetTinhInteract").innerText = targetData.tinhInteract;
+
+            // Relations
+            let relSinhKhac = checkSinhKhac(selfData.hanhVal, targetData.hanhVal);
+            document.getElementById("relSinhKhac").innerText = relSinhKhac;
+
+            let relDiaChi = checkDiaChiRel(selfData.chiVal, targetData.chiVal);
+            document.getElementById("relDiaChi").innerText = relDiaChi;
+
+            // Advice List
+            let advice = ADVICE_DB[targetIdx];
+            let adviceHTML = `
+                <li><span class="adv-label" style="color:#388e3c">🌟 Quý Nhân:</span> ${advice.qn}</li>
+                <li><span class="adv-label" style="color:#d32f2f">🚫 Tiểu Nhân:</span> ${advice.tn}</li>
+                <li><span class="adv-label" style="color:#1976d2">⬆ Hướng Tốt:</span> ${advice.ht}</li>
+                <li><span class="adv-label" style="color:#555">⬇ Hướng Xấu:</span> ${advice.hx}</li>
+            `;
+            document.getElementById("bookAdvice").innerHTML = adviceHTML;
+        }
+    </script>
+</body>
+</html>
